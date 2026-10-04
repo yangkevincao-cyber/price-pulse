@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><defs>
+    <linearGradient id="animGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1E3A8A;stop-opacity:1"></stop>
+      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#1E3A8A;stop-opacity:1"></stop>
+    </linearGradient>
+    
+    <filter id="animGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"></feGaussianBlur>
+      <feMerge>
+        <feMergeNode in="blur"></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs><g filter="url(#animGlow)">
+    <path d="M 40,100 L 80,100 L 95,60 L 110,140 L 125,80 L 140,100 L 180,100" stroke="url(#animGradient)" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <animate attributeName="stroke-dashoffset" from="400" to="0" dur="2s" repeatCount="indefinite"></animate>
+      <animate attributeName="stroke-dasharray" from="10 300" to="300 300" dur="3s" repeatCount="indefinite"></animate>
+    </path>
+  </g><circle cx="230" cy="90" r="20" fill="#F59E0B" opacity="0.3">
+    <animate attributeName="r" from="20" to="30" dur="1.5s" repeatCount="indefinite"></animate>
+    <animate attributeName="opacity" from="0.3" to="0" dur="1.5s" repeatCount="indefinite"></animate>
+  </circle><circle cx="230" cy="90" r="15" fill="#F59E0B"></circle><text x="230" y="94" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="16" fill="white" text-anchor="middle">$</text><text x="40" y="170" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="42" fill="#1F2937" letter-spacing="2">
+    PRICE
+  </text><text x="220" y="170" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="42" fill="url(#animGradient)" letter-spacing="2">
+    PULSE
+  </text><text x="40" y="195" font-family="'Open Sans', Arial, sans-serif" font-size="14" fill="#6B7280" letter-spacing="4" font-weight="600">
+    FEEL THE MARKET PULSE
+    <animate attributeName="opacity" from="0" to="1" dur="2s" begin="1s" fill="freeze"></animate>
+  </text></svg>

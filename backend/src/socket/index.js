@@ -1,35 +1,45 @@
 // backend/src/socket/index.js
 const socketIO = require('socket.io');
-const jwt = require('jsonwebtoken');
-const db = require('../config/database');
-const Redis = require('ioredis');
+const { logger } = require('../config/logger');
+const { redis } = require('../config/redis');
+const authConfig = require('../config/auth');
+const { User } = require('../models');
+const connectionHandler = require('./handlers/connectionHandler');
+const alertHandler = require('./handlers/alertHandler');
+const chatHandler = require('./handlers/chatHandler');
+const notificationHandler = require('./handlers/notificationHandler');
+const exchangeHandler = require('./handlers/exchangeHandler');
 
-class NotificationSystem {
-    constructor(server) {
-        this.io = socketIO(server, {
-            cors: {
-                origin: process.env.FRONTEND_URL || 'http://localhost:3001',
-                credentials: true
-            },
-            pingTimeout: 60000,
-            pingInterval: 25000
-        });
-
-        this.redis = new Redis({
-            host: process.env.REDIS_HOST || 'localhost',
-            port: process.env.REDIS_PORT || 6379,
-            retryStrategy: (times) => Math.min(times * 50, 2000)
-        });
-
-        this.userSockets = new Map(); // userId -> socketId
-        this.sellerRooms = new Map(); // sellerId -> room name
-
-        this.setupMiddleware();
-        this.setupEventHandlers();
-        this.startBackgroundTasks();
+class SocketServer {
+    constructor() {
+        this.io = null;
+        this.userSockets = new Map(); // userId -> Set of socketIds
+        this.socketUsers = new Map(); // socketId -> userId
+        this.sellerRooms = new Map(); // sellerId -> roomName
+        this.isInitialized = false;
     }
 
-    setupMiddleware() {
+    /**
+     * Initialize Socket.IO server
+     */
+    initialize(server) {
+        if (this.isInitialized) {
+            logger.warn('Socket server already initialized');
+            return;
+        }
+
+        this.io = socketIO(server, {
+            cors: {
+                origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3001'],
+                credentials: true,
+            },
+            pingTimeout: 60000,
+            pingInterval: 25000,
+            transports: ['websocket', 'polling'],
+            allowEIO3: true,
+        });
+
+        // Authentication middleware
         this.io.use(async (socket, next) => {
             try {
                 const token = socket.handshake.auth.token;
@@ -37,329 +47,391 @@ class NotificationSystem {
                     return next(new Error('Authentication required'));
                 }
 
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                const user = await db.query(
-                    'SELECT id, username, role FROM users WHERE id = $1',
-                    [decoded.userId]
-                );
+                // Verify token
+                const decoded = await authConfig.verifyAccessToken(token);
+                const user = await User.findByPk(decoded.id, {
+                    attributes: ['id', 'username', 'email', 'role', 'is_active'],
+                });
 
-                if (!user.rows.length) {
-                    return next(new Error('User not found'));
+                if (!user || !user.is_active) {
+                    return next(new Error('User not found or inactive'));
                 }
 
-                socket.user = user.rows[0];
+                socket.user = user;
                 next();
             } catch (error) {
-                next(new Error('Invalid token'));
+                logger.error('Socket auth error:', error);
+                next(new Error('Authentication failed'));
             }
         });
-    }
 
-    setupEventHandlers() {
+        // Connection handler
         this.io.on('connection', (socket) => {
-            console.log(`User connected: ${socket.user.username} (${socket.id})`);
+            this.handleConnection(socket);
+        });
 
-            // Store connection
-            this.userSockets.set(socket.user.id, socket.id);
+        // Error handler
+        this.io.on('error', (error) => {
+            logger.error('Socket server error:', error);
+        });
 
-            // Join seller room if applicable
-            if (socket.user.role === 'seller') {
-                const roomName = `seller_${socket.user.id}`;
-                socket.join(roomName);
-                this.sellerRooms.set(socket.user.id, roomName);
-                console.log(`Seller ${socket.user.username} joined room ${roomName}`);
-            }
+        this.isInitialized = true;
+        logger.info('Socket.IO server initialized');
+    }
 
-            // Handle subscription to product alerts
-            socket.on('subscribe_product', async (productId) => {
-                const roomName = `product_${productId}`;
-                socket.join(roomName);
-                socket.subscribedProducts = socket.subscribedProducts || new Set();
-                socket.subscribedProducts.add(productId);
+    /**
+     * Handle new connection
+     */
+    handleConnection(socket) {
+        const userId = socket.user.id;
+        const username = socket.user.username;
 
-                // Send recent alerts for this product
-                const recentAlerts = await this.getRecentProductAlerts(productId, socket.user.id);
-                socket.emit('product_alerts_history', recentAlerts);
-            });
+        // Store connection
+        if (!this.userSockets.has(userId)) {
+            this.userSockets.set(userId, new Set());
+        }
+        this.userSockets.get(userId).add(socket.id);
+        this.socketUsers.set(socket.id, userId);
 
-            // Handle subscription to category alerts
-            socket.on('subscribe_category', async (categoryId) => {
-                const roomName = `category_${categoryId}`;
-                socket.join(roomName);
-                socket.subscribedCategories = socket.subscribedCategories || new Set();
-                socket.subscribedCategories.add(categoryId);
-            });
+        // Join user room
+        const userRoom = `user_${userId}`;
+        socket.join(userRoom);
 
-            // Handle demand alert preferences update
-            socket.on('update_alert_preferences', async (preferences) => {
-                await db.query(`
-                    UPDATE seller_alert_subscriptions
-                    SET alert_frequency = $1,
-                        min_demand_score = $2,
-                        updated_at = NOW()
-                    WHERE seller_id = $3
-                `, [preferences.frequency, preferences.minScore, socket.user.id]);
+        // Join seller room if seller
+        if (socket.user.role === 'seller') {
+            const sellerRoom = `seller_${userId}`;
+            socket.join(sellerRoom);
+            this.sellerRooms.set(userId, sellerRoom);
+        }
 
-                socket.emit('preferences_updated', { success: true });
-            });
+        // Join admin room if admin
+        if (socket.user.role === 'admin') {
+            socket.join('admin_room');
+        }
 
-            // Handle price check requests (real-time)
-            socket.on('check_price', async (productId) => {
-                const priceData = await this.getRealTimePrice(productId);
-                socket.emit('price_update', priceData);
-            });
+        logger.info(`Socket connected: ${username} (${userId}) - ${socket.id}`);
 
-            // Handle exchange match requests
-            socket.on('find_exchange_matches', async (listingId) => {
-                const matches = await this.findExchangeMatches(listingId);
-                socket.emit('exchange_matches', matches);
-            });
+        // Send initial data
+        this.sendInitialData(socket);
 
-            // Handle disconnect
-            socket.on('disconnect', () => {
-                console.log(`User disconnected: ${socket.user.username}`);
-                this.userSockets.delete(socket.user.id);
-                this.sellerRooms.delete(socket.user.id);
-            });
+        // Setup event handlers
+        this.setupEventHandlers(socket);
+
+        // Broadcast online status
+        this.broadcastOnlineStatus(userId, true);
+
+        // Handle disconnect
+        socket.on('disconnect', () => {
+            this.handleDisconnect(socket);
+        });
+
+        // Handle errors
+        socket.on('error', (error) => {
+            logger.error(`Socket error for ${username}:`, error);
         });
     }
 
-    // Send real-time demand alert to sellers
-    async sendDemandAlert(alertData) {
-        const { sellerId, productName, demandScore, message, opportunityScore } = alertData;
-
-        const roomName = `seller_${sellerId}`;
-
-        // Check if seller is online
-        const hasRoom = this.io.sockets.adapter.rooms.has(roomName);
-
-        if (hasRoom) {
-            // Send real-time notification
-            this.io.to(roomName).emit('new_demand_alert', {
-                id: Date.now(),
-                product_name: productName,
-                demand_score: demandScore,
-                message: message,
-                opportunity_score: opportunityScore,
+    /**
+     * Send initial data to client
+     */
+    async sendInitialData(socket) {
+        try {
+            // Send user data
+            socket.emit('initial_data', {
+                user: {
+                    id: socket.user.id,
+                    username: socket.user.username,
+                    email: socket.user.email,
+                    role: socket.user.role,
+                },
                 timestamp: new Date().toISOString(),
-                read: false
             });
 
-            // Store in Redis for persistence
-            await this.redis.lpush(
-                `alerts:${sellerId}`,
-                JSON.stringify({
-                    ...alertData,
-                    sent_at: new Date().toISOString(),
-                    read: false
-                })
-            );
-            await this.redis.ltrim(`alerts:${sellerId}`, 0, 99); // Keep last 100 alerts
-        } else {
-            // Store for when user comes online
-            await this.redis.lpush(
-                `pending_alerts:${sellerId}`,
-                JSON.stringify(alertData)
-            );
-        }
+            // Send notifications
+            await notificationHandler.sendInitialNotifications(socket);
 
-        // Always store in database
-        await db.query(`
-            INSERT INTO demand_alerts 
-            (seller_id, product_name, demand_score, message, opportunity_score, created_at)
-            VALUES ($1, $2, $3, $4, $5, NOW())
-        `, [sellerId, productName, demandScore, message, opportunityScore]);
-    }
-
-    // Broadcast price drop to interested buyers
-    async broadcastPriceDrop(productId, oldPrice, newPrice) {
-        const roomName = `product_${productId}`;
-        const dropPercent = ((oldPrice - newPrice) / oldPrice) * 100;
-
-        if (dropPercent > 10) { // Only notify for significant drops
-            this.io.to(roomName).emit('price_drop_alert', {
-                product_id: productId,
-                old_price: oldPrice,
-                new_price: newPrice,
-                drop_percent: dropPercent,
-                message: `🚨 Price dropped by ${dropPercent.toFixed(1)}%!`
-            });
-        }
-    }
-
-    // Send trending product updates to all sellers
-    async broadcastTrendingProducts() {
-        const trending = await db.query(`
-            SELECT 
-                p.id,
-                p.name,
-                p.demand_score,
-                COUNT(DISTINCT sq.id) as searches_24h
-            FROM products p
-            LEFT JOIN search_queries sq ON sq.query_text ILIKE '%' || p.name || '%'
-                AND sq.created_at > NOW() - INTERVAL '24 hours'
-            WHERE p.demand_score > 0.7
-            GROUP BY p.id
-            ORDER BY p.demand_score DESC
-            LIMIT 10
-        `);
-
-        // Broadcast to all seller rooms
-        for (const [sellerId, roomName] of this.sellerRooms) {
-            this.io.to(roomName).emit('trending_update', {
-                products: trending.rows,
-                timestamp: new Date().toISOString()
-            });
-        }
-    }
-
-    // Send personalized recommendations to seller
-    async sendPersonalizedRecommendations(sellerId) {
-        const recommendations = await db.query(`
-            WITH seller_products AS (
-                SELECT DISTINCT category_id
-                FROM listings
-                WHERE seller_id = $1 AND status = 'active'
-            ),
-            high_demand_products AS (
-                SELECT 
-                    p.id,
-                    p.name,
-                    p.category_id,
-                    p.demand_score,
-                    COUNT(DISTINCT sq.id) as searches,
-                    COUNT(DISTINCT l.id) as active_sellers
-                FROM products p
-                LEFT JOIN search_queries sq ON sq.query_text ILIKE '%' || p.name || '%'
-                    AND sq.created_at > NOW() - INTERVAL '7 days'
-                LEFT JOIN listings l ON l.product_id = p.id AND l.status = 'active'
-                WHERE p.category_id IN (SELECT category_id FROM seller_products)
-                    AND p.demand_score > 0.6
-                    AND p.id NOT IN (
-                        SELECT product_id FROM listings 
-                        WHERE seller_id = $1 AND status = 'active'
-                    )
-                GROUP BY p.id
-                ORDER BY p.demand_score DESC
-                LIMIT 5
-            )
-            SELECT * FROM high_demand_products
-        `, [sellerId]);
-
-        const roomName = `seller_${sellerId}`;
-        if (recommendations.rows.length > 0) {
-            this.io.to(roomName).emit('personalized_recommendations', {
-                products: recommendations.rows,
-                message: '🎯 Products you should consider selling based on your niche!'
-            });
-        }
-    }
-
-    // Handle exchange match notifications
-    async notifyExchangeMatch(matchData) {
-        const { user1Id, user2Id, matchScore, product1, product2 } = matchData;
-
-        for (const userId of [user1Id, user2Id]) {
-            const socketId = this.userSockets.get(userId);
-            if (socketId) {
-                this.io.to(socketId).emit('exchange_match_found', {
-                    match_id: matchData.id,
-                    match_score: matchScore,
-                    their_product: userId === user1Id ? product2 : product1,
-                    your_product: userId === user1Id ? product1 : product2,
-                    suggested_adjustment: matchData.suggested_cash_adjustment,
-                    message: `🤝 Great exchange match found! ${(matchScore * 100).toFixed(0)}% match quality`
-                });
+            // Send alerts if seller
+            if (socket.user.role === 'seller') {
+                await alertHandler.sendInitialAlerts(socket);
             }
+
+            // Send unread chat messages
+            await chatHandler.sendInitialMessages(socket);
+
+            // Send pending exchange matches
+            if (socket.user.role === 'seller') {
+                await exchangeHandler.sendInitialMatches(socket);
+            }
+
+        } catch (error) {
+            logger.error('Send initial data error:', error);
         }
     }
 
-    // Background tasks
-    startBackgroundTasks() {
-        // Send trending updates every hour
-        setInterval(() => {
-            this.broadcastTrendingProducts();
-        }, 3600000);
+    /**
+     * Setup event handlers
+     */
+    setupEventHandlers(socket) {
+        // Alert handlers
+        socket.on('subscribe_alerts', () => alertHandler.subscribeAlerts(socket));
+        socket.on('mark_alert_read', (data) => alertHandler.markAlertRead(socket, data));
+        socket.on('mark_all_alerts_read', () => alertHandler.markAllAlertsRead(socket));
 
-        // Send personalized recommendations every 6 hours
-        setInterval(() => {
-            for (const [sellerId] of this.sellerRooms) {
-                this.sendPersonalizedRecommendations(sellerId);
-            }
-        }, 21600000);
+        // Chat handlers
+        socket.on('join_chat', (data) => chatHandler.joinChat(socket, data));
+        socket.on('leave_chat', (data) => chatHandler.leaveChat(socket, data));
+        socket.on('send_message', (data) => chatHandler.sendMessage(socket, data));
+        socket.on('typing', (data) => chatHandler.typing(socket, data));
+        socket.on('stop_typing', (data) => chatHandler.stopTyping(socket, data));
+        socket.on('mark_message_read', (data) => chatHandler.markMessageRead(socket, data));
 
-        // Clean up old Redis data daily
-        setInterval(async () => {
-            const keys = await this.redis.keys('pending_alerts:*');
-            const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        // Notification handlers
+        socket.on('mark_notification_read', (data) => notificationHandler.markRead(socket, data));
+        socket.on('mark_all_notifications_read', () => notificationHandler.markAllRead(socket));
 
-            for (const key of keys) {
-                const alerts = await this.redis.lrange(key, 0, -1);
-                for (const alert of alerts) {
-                    const data = JSON.parse(alert);
-                    if (new Date(data.sent_at).getTime() < oneWeekAgo) {
-                        await this.redis.lrem(key, 1, alert);
-                    }
+        // Exchange handlers
+        socket.on('subscribe_exchanges', () => exchangeHandler.subscribeExchanges(socket));
+        socket.on('accept_exchange', (data) => exchangeHandler.acceptExchange(socket, data));
+        socket.on('decline_exchange', (data) => exchangeHandler.declineExchange(socket, data));
+
+        // Product handlers
+        socket.on('subscribe_product', (data) => this.subscribeProduct(socket, data));
+        socket.on('unsubscribe_product', (data) => this.unsubscribeProduct(socket, data));
+
+        // Category handlers
+        socket.on('subscribe_category', (data) => this.subscribeCategory(socket, data));
+        socket.on('unsubscribe_category', (data) => this.unsubscribeCategory(socket, data));
+
+        // Heartbeat
+        socket.on('ping', () => {
+            socket.emit('pong', { timestamp: new Date().toISOString() });
+        });
+    }
+
+    /**
+     * Handle disconnect
+     */
+    handleDisconnect(socket) {
+        const userId = this.socketUsers.get(socket.id);
+        if (userId) {
+            // Remove socket from user's set
+            const userSockets = this.userSockets.get(userId);
+            if (userSockets) {
+                userSockets.delete(socket.id);
+                if (userSockets.size === 0) {
+                    this.userSockets.delete(userId);
+                    this.sellerRooms.delete(userId);
                 }
             }
-        }, 86400000);
+            this.socketUsers.delete(socket.id);
+
+            logger.info(`Socket disconnected: ${socket.user.username} (${userId})`);
+
+            // Broadcast offline status if no more connections
+            if (!this.userSockets.has(userId)) {
+                this.broadcastOnlineStatus(userId, false);
+            }
+        }
     }
 
-    // Helper methods
-    async getRecentProductAlerts(productId, userId) {
-        const alerts = await db.query(`
-            SELECT * FROM demand_alerts
-            WHERE product_id = $1 AND seller_id = $2
-            ORDER BY created_at DESC
-            LIMIT 10
-        `, [productId, userId]);
+    /**
+     * Subscribe to product updates
+     */
+    async subscribeProduct(socket, data) {
+        const { productId } = data;
+        const room = `product_${productId}`;
+        socket.join(room);
 
-        return alerts.rows;
+        socket.productSubscriptions = socket.productSubscriptions || new Set();
+        socket.productSubscriptions.add(productId);
+
+        // Send recent price history
+        const { PriceHistory } = require('../models');
+        const history = await PriceHistory.findAll({
+            where: { product_id: productId },
+            order: [['created_at', 'DESC']],
+            limit: 10,
+        });
+
+        socket.emit('product_history', {
+            productId,
+            history,
+            timestamp: new Date().toISOString(),
+        });
+
+        logger.debug(`Product subscribed: ${productId} by ${socket.user.username}`);
     }
 
-    async getRealTimePrice(productId) {
-        const price = await db.query(`
-            SELECT price, source_name, scraped_at
-            FROM external_prices ep
-            JOIN external_sources es ON es.id = ep.source_id
-            WHERE ep.product_id = $1
-            ORDER BY ep.scraped_at DESC
-            LIMIT 1
-        `, [productId]);
+    /**
+     * Unsubscribe from product updates
+     */
+    unsubscribeProduct(socket, data) {
+        const { productId } = data;
+        const room = `product_${productId}`;
+        socket.leave(room);
 
-        return price.rows[0] || null;
+        if (socket.productSubscriptions) {
+            socket.productSubscriptions.delete(productId);
+        }
+
+        logger.debug(`Product unsubscribed: ${productId} by ${socket.user.username}`);
     }
 
-    async findExchangeMatches(listingId) {
-        const matches = await db.query(`
-            SELECT * FROM exchange_matches
-            WHERE listing1_id = $1 OR listing2_id = $1
-            ORDER BY match_score DESC
-            LIMIT 5
-        `, [listingId]);
+    /**
+     * Subscribe to category updates
+     */
+    subscribeCategory(socket, data) {
+        const { categoryId } = data;
+        const room = `category_${categoryId}`;
+        socket.join(room);
 
-        return matches.rows;
+        socket.categorySubscriptions = socket.categorySubscriptions || new Set();
+        socket.categorySubscriptions.add(categoryId);
+
+        logger.debug(`Category subscribed: ${categoryId} by ${socket.user.username}`);
     }
 
-    // Send notification to specific user
-    async sendToUser(userId, event, data) {
-        const socketId = this.userSockets.get(userId);
-        if (socketId) {
-            this.io.to(socketId).emit(event, data);
+    /**
+     * Unsubscribe from category updates
+     */
+    unsubscribeCategory(socket, data) {
+        const { categoryId } = data;
+        const room = `category_${categoryId}`;
+        socket.leave(room);
+
+        if (socket.categorySubscriptions) {
+            socket.categorySubscriptions.delete(categoryId);
+        }
+
+        logger.debug(`Category unsubscribed: ${categoryId} by ${socket.user.username}`);
+    }
+
+    /**
+     * Broadcast online status
+     */
+    broadcastOnlineStatus(userId, isOnline) {
+        this.io.emit('user_status', {
+            userId,
+            isOnline,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
+    /**
+     * Send notification to user
+     */
+    sendToUser(userId, event, data) {
+        const socketIds = this.userSockets.get(userId);
+        if (socketIds) {
+            for (const socketId of socketIds) {
+                this.io.to(socketId).emit(event, data);
+            }
             return true;
         }
         return false;
     }
 
-    // Get online status of user
+    /**
+     * Send to room
+     */
+    sendToRoom(room, event, data) {
+        this.io.to(room).emit(event, data);
+    }
+
+    /**
+     * Send to all sellers
+     */
+    sendToSellers(event, data) {
+        const rooms = Array.from(this.sellerRooms.values());
+        for (const room of rooms) {
+            this.io.to(room).emit(event, data);
+        }
+    }
+
+    /**
+     * Send to admins
+     */
+    sendToAdmins(event, data) {
+        this.io.to('admin_room').emit(event, data);
+    }
+
+    /**
+     * Broadcast demand alert
+     */
+    broadcastDemandAlert(alert) {
+        // Send to specific seller
+        if (alert.user_id) {
+            this.sendToUser(alert.user_id, 'new_demand_alert', alert);
+        }
+
+        // Also broadcast to all sellers if high opportunity
+        if (alert.opportunity_score > 0.8) {
+            this.sendToSellers('high_opportunity_alert', alert);
+        }
+    }
+
+    /**
+     * Broadcast price update
+     */
+    broadcastPriceUpdate(productId, priceData) {
+        const room = `product_${productId}`;
+        this.sendToRoom(room, 'price_update', {
+            productId,
+            ...priceData,
+            timestamp: new Date().toISOString(),
+        });
+    }
+
+    /**
+     * Get connected users
+     */
+    getConnectedUsers() {
+        return Array.from(this.userSockets.keys());
+    }
+
+    /**
+     * Check if user is online
+     */
     isUserOnline(userId) {
         return this.userSockets.has(userId);
     }
 
-    // Get all online sellers
-    getOnlineSellers() {
-        return Array.from(this.sellerRooms.keys());
+    /**
+     * Get connection stats
+     */
+    getStats() {
+        return {
+            totalConnections: this.userSockets.size,
+            totalSockets: this.socketUsers.size,
+            totalSellers: this.sellerRooms.size,
+            users: Array.from(this.userSockets.keys()),
+            rooms: Array.from(this.io.sockets.adapter.rooms.keys()),
+        };
+    }
+
+    /**
+     * Close Socket.IO server
+     */
+    close() {
+        if (this.io) {
+            this.io.close();
+            this.isInitialized = false;
+            this.userSockets.clear();
+            this.socketUsers.clear();
+            this.sellerRooms.clear();
+            logger.info('Socket.IO server closed');
+        }
+    }
+
+    /**
+     * Get Socket.IO instance
+     */
+    getIO() {
+        return this.io;
     }
 }
 
-module.exports = NotificationSystem;
+// Singleton instance
+const socketServer = new SocketServer();
+
+module.exports = socketServer;

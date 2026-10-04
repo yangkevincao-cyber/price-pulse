@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="50" viewBox="0 0 180 50"><defs><linearGradient id="a" x1="0%" x2="100%" y1="0%" y2="0%"><stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1"/><stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1"/></linearGradient></defs><g transform="translate(0 4)"><path fill="none" stroke="url(#a)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2 21h6l4-8 6 16 4-11 6 3h6"/><circle cx="32" cy="21" r="2" fill="#f59e0b"/></g><text x="40" y="32" fill="#1f2937" font-family="'Montserrat', 'Arial Black', sans-serif" font-size="20" font-weight="900" letter-spacing=".5">
+    PRICE
+  </text><text x="130" y="32" fill="url(#a)" font-family="'Montserrat', 'Arial Black', sans-serif" font-size="20" font-weight="900" letter-spacing=".5">
+    PULSE
+  </text></svg>

@@ -1,0 +1,30 @@
+# public/robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /checkout/
+
+# Sitemap location
+Sitemap: https://pricepulse.com/sitemap.xml
+
+# Googlebot specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Bingbot specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Images
+User-agent: Googlebot-Image
+Allow: /images/
+
+# Videos
+User-agent: Googlebot-Video
+Allow: /videos/

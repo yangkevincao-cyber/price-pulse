@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><defs>
+    <linearGradient id="markGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E3A8A;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1"></stop>
+    </linearGradient>
+    
+    <linearGradient id="markTagGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#EF4444;stop-opacity:1"></stop>
+    </linearGradient>
+  </defs><path d="M 15,40 L 25,40 L 32,20 L 42,60 L 48,30 L 58,40 L 65,40" stroke="url(#markGradient)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M 62,30 L 72,20 L 78,30 L 72,45 Z" fill="url(#markTagGradient)" opacity="0.95"></path><text x="70" y="34" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="12" fill="white" text-anchor="middle">$</text></svg>

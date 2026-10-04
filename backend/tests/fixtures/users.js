@@ -1,0 +1,50 @@
+// backend/tests/fixtures/users.js
+
+const users = {
+    admin: {
+        id: '11111111-1111-1111-1111-111111111111',
+        email: 'admin@pricepulse.com',
+        username: 'admin',
+        password: '$2a$10$hashedpasswordhere',
+        first_name: 'Admin',
+        last_name: 'User',
+        role: 'admin',
+        is_verified: true,
+        is_active: true,
+        email_verified: true,
+        email_verified_at: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
+    },
+    seller: {
+        id: '22222222-2222-2222-2222-222222222222',
+        email: 'seller@pricepulse.com',
+        username: 'seller',
+        password: '$2a$10$hashedpasswordhere',
+        first_name: 'Seller',
+        last_name: 'User',
+        role: 'seller',
+        is_verified: true,
+        is_active: true,
+        seller_rating: 4.8,
+        total_sales: 50,
+        total_reviews: 45,
+        created_at: new Date(),
+        updated_at: new Date(),
+    },
+    buyer: {
+        id: '33333333-3333-3333-3333-333333333333',
+        email: 'buyer@pricepulse.com',
+        username: 'buyer',
+        password: '$2a$10$hashedpasswordhere',
+        first_name: 'Buyer',
+        last_name: 'User',
+        role: 'buyer',
+        is_verified: true,
+        is_active: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+    },
+};
+
+module.exports = users;

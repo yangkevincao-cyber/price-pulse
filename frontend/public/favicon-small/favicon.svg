@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 50" width="180" height="50"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><defs>
+    <linearGradient id="sTextGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1E3A8A;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1"></stop>
+    </linearGradient>
+  </defs><g transform="translate(0, 4)">
+    <path d="M 2,21 L 8,21 L 12,13 L 18,29 L 22,18 L 28,21 L 34,21" stroke="url(#sTextGradient)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+    <circle cx="32" cy="21" r="2" fill="#F59E0B"></circle>
+  </g><text x="40" y="32" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="20" fill="#1F2937" letter-spacing="0.5">
+    PRICE
+  </text><text x="130" y="32" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="20" fill="url(#sTextGradient)" letter-spacing="0.5">
+    PULSE
+  </text></svg>

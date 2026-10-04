@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><defs>
+    <!-- Gradients -->
+    <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1E3A8A;stop-opacity:1"></stop>
+      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1"></stop>
+    </linearGradient>
+    
+    <linearGradient id="tagGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#EF4444;stop-opacity:1"></stop>
+    </linearGradient>
+    
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1E3A8A;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1"></stop>
+    </linearGradient>
+    
+    <!-- Drop shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.1"></feDropShadow>
+    </filter>
+  </defs><g filter="url(#shadow)">
+    <!-- Pulse line -->
+    <path d="M 40,100 L 80,100 L 95,60 L 110,140 L 125,80 L 140,100 L 180,100" stroke="url(#pulseGradient)" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+    
+    <!-- Price tag (diamond shape) -->
+    <path d="M 200,80 L 230,60 L 260,80 L 230,120 Z" fill="url(#tagGradient)" opacity="0.95"></path>
+    
+    <!-- Dollar sign in tag -->
+    <text x="230" y="96" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="28" fill="white" text-anchor="middle">$</text>
+  </g><text x="40" y="170" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="42" fill="#1F2937" letter-spacing="2">
+    PRICE
+  </text><text x="220" y="170" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="42" fill="url(#textGradient)" letter-spacing="2">
+    PULSE
+  </text><text x="40" y="195" font-family="'Open Sans', Arial, sans-serif" font-size="14" fill="#6B7280" letter-spacing="4" font-weight="600">
+    FEEL THE MARKET PULSE
+  </text></svg>

@@ -1,63 +1,80 @@
 // backend/src/routes/demandAlerts.js
 const express = require('express');
 const router = express.Router();
-const DemandAlertService = require('../services/demandAlertService');
-const { authenticateUser } = require('../middleware/auth');
+const { body, param, query } = require('express-validator');
 
-const alertService = new DemandAlertService();
+const demandAlertController = require('../controllers/demandAlertController');
+const { authenticate, isAdmin } = require('../middleware/auth');
+const rateLimiter = require('../middleware/rateLimiter');
 
-// Get seller's demand alert dashboard
-router.get('/dashboard', authenticateUser, async (req, res) => {
-    const dashboard = await alertService.getSellerDashboard(req.user.id);
-    res.json(dashboard);
-});
+// Validation rules
+const subscriptionValidation = [
+    body('category_id').optional().isInt().withMessage('Invalid category ID'),
+    body('product_id').optional().isUUID(4).withMessage('Invalid product ID'),
+    body('min_demand_score').optional().isFloat({ min: 0, max: 1 }).withMessage('Score must be between 0 and 1'),
+    body('alert_frequency').optional().isIn(['instant', 'daily', 'weekly']).withMessage('Invalid frequency'),
+];
 
-// Subscribe to demand alerts
-router.post('/subscribe', authenticateUser, async (req, res) => {
-    const { category_id, product_id, min_demand_score, alert_frequency } = req.body;
+const alertIdValidation = [
+    param('id').isInt().withMessage('Invalid alert ID format'),
+];
 
-    const subscription = await db.query(`
-        INSERT INTO seller_alert_subscriptions 
-        (seller_id, category_id, product_id, min_demand_score, alert_frequency)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING *
-    `, [req.user.id, category_id, product_id, min_demand_score, alert_frequency]);
+// Routes
+router.get('/my-alerts',
+    authenticate,
+    demandAlertController.getMyAlerts
+);
 
-    res.json(subscription.rows[0]);
-});
+router.get('/recent',
+    authenticate,
+    demandAlertController.getRecentAlerts
+);
 
-// Mark alert as read
-router.patch('/alerts/:alertId/read', authenticateUser, async (req, res) => {
-    await db.query(`
-        UPDATE demand_alerts 
-        SET read = true 
-        WHERE id = $1 AND seller_id = $2
-    `, [req.params.alertId, req.user.id]);
+router.get('/opportunities',
+    authenticate,
+    demandAlertController.getOpportunities
+);
 
-    res.json({ success: true });
-});
+router.get('/stats',
+    authenticate,
+    demandAlertController.getAlertStats
+);
 
-// Get trending products (public endpoint)
-router.get('/trending', async (req, res) => {
-    const trending = await db.query(`
-        SELECT 
-            p.id,
-            p.name,
-            p.demand_score,
-            COUNT(DISTINCT sq.id) as searches_24h,
-            COUNT(DISTINCT l.id) as active_sellers,
-            MIN(l.price) as lowest_price
-        FROM products p
-        LEFT JOIN search_queries sq ON sq.query_text ILIKE '%' || p.name || '%'
-            AND sq.created_at > NOW() - INTERVAL '24 hours'
-        LEFT JOIN listings l ON l.product_id = p.id AND l.status = 'active'
-        WHERE p.demand_score > 0.5
-        GROUP BY p.id
-        ORDER BY p.demand_score DESC
-        LIMIT 50
-    `);
+router.patch('/:id/read',
+    authenticate,
+    alertIdValidation,
+    demandAlertController.markAsRead
+);
 
-    res.json(trending.rows);
-});
+router.patch('/read-all',
+    authenticate,
+    demandAlertController.markAllAsRead
+);
+
+// Subscription routes
+router.get('/subscriptions',
+    authenticate,
+    demandAlertController.getSubscriptions
+);
+
+router.post('/subscribe',
+    authenticate,
+    rateLimiter.auth,
+    subscriptionValidation,
+    demandAlertController.subscribe
+);
+
+router.delete('/unsubscribe',
+    authenticate,
+    subscriptionValidation,
+    demandAlertController.unsubscribe
+);
+
+// Admin routes
+router.post('/generate',
+    authenticate,
+    isAdmin,
+    demandAlertController.triggerAlertGeneration
+);
 
 module.exports = router;
