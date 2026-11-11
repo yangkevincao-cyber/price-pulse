@@ -20,7 +20,7 @@
         "create:admin": "node scripts/createAdmin.js"
     },
     "devDependencies": {
-        "eslint": "^8.48.0",
+        "eslint": "^8.57.1",
         "eslint-config-prettier": "^9.1.2",
         "eslint-plugin-prettier": "^5.0.0",
         "jest": "^29.6.4",
