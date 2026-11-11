@@ -647,23 +647,33 @@ class NotificationController {
 
             let result;
             switch (channel) {
-                case 'email':
+                case 'email': {
                     const user = await User.findByPk(userId);
+                    if (!user || !user.email) {
+                        return res.status(400).json({
+                            success: false,
+                            error: 'User does not have an email address',
+                        });
+                    }
                     result = await emailService.send({
                         to: user.email,
                         subject: 'Test Notification',
                         html: this.buildEmailTemplate('Test Notification', testMessage),
                     });
                     break;
-                case 'push':
+                }
+
+                case 'push': {
                     result = await pushNotificationService.sendToUser(userId, {
                         title: 'Test Notification',
                         message: testMessage,
                     });
                     break;
-                case 'sms':
+                }
+
+                case 'sms': {
                     const userData = await User.findByPk(userId);
-                    if (!userData.phone) {
+                    if (!userData || !userData.phone) {
                         return res.status(400).json({
                             success: false,
                             error: 'User does not have a phone number',
@@ -671,6 +681,8 @@ class NotificationController {
                     }
                     result = await smsService.sendSms(userData.phone, testMessage);
                     break;
+                }
+
                 default:
                     return res.status(400).json({
                         success: false,

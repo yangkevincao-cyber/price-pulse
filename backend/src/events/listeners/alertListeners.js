@@ -1,6 +1,6 @@
 // backend/src/events/listeners/alertListeners.js
 const { logger } = require('../../config/logger');
-const { User, Product } = require('../../models');
+const { Product } = require('../../models');
 const notificationEmitter = require('../emitters/notificationEmitter');
 const analyticsEmitter = require('../emitters/analyticsEmitter');
 

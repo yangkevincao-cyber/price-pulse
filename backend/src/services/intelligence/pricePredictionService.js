@@ -1,7 +1,6 @@
 // backend/src/services/intelligence/pricePredictionService.js
 const { sequelize } = require('../../config/database');
-const { PriceHistory, Product, ExternalPrice } = require('../../models');
-const { logger } = require('../../config/logger');
+const { PriceHistory, ExternalPrice } = require('../../models');
 const { redis } = require('../../config/redis');
 
 class PricePredictionService {
@@ -92,7 +91,6 @@ class PricePredictionService {
 
         let smoothed = prices[0];
         let trend = 0;
-        let seasonal = 0;
 
         for (let i = 1; i < prices.length; i++) {
             const newSmoothed = alpha * prices[i] + (1 - alpha) * (smoothed + trend);
@@ -338,7 +336,6 @@ class PricePredictionService {
      * Get fallback prediction
      */
     async getFallbackPrediction(productId) {
-        const product = await Product.findByPk(productId);
         const similar = await ExternalPrice.findAll({
             where: { product_id: productId },
             order: [['scraped_at', 'DESC']],

@@ -18,7 +18,6 @@ class ImageProcessor {
                     { width: 200, height: 200, quality: 70, suffix: 'thumb' }
                 ],
                 format = 'webp',
-                fit = 'cover'
             } = options;
 
             const results = [];
@@ -144,7 +143,7 @@ class ImageProcessor {
      * Get image metadata
      */
     async getMetadata(inputPath) {
-        return await sharp(inputPath).metadata();
+        return sharp(inputPath).metadata();
     }
 
     /**

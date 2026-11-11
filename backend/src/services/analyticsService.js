@@ -251,7 +251,7 @@ class AnalyticsService {
     }
 
     // Real-time dashboard updates via WebSocket
-    async updateRealTimeDashboard(event) {
+    async updateRealTimeDashboard() {
         const stats = await this.getRealTimeStats();
 
         // Broadcast to all admin clients
@@ -261,7 +261,6 @@ class AnalyticsService {
 
     async getRealTimeStats() {
         const now = new Date();
-        const hourAgo = new Date(now - 3600000);
 
         const stats = await db.query(`
             SELECT 
@@ -358,7 +357,7 @@ class AnalyticsService {
         } else if (format === 'json') {
             return data;
         } else if (format === 'pdf') {
-            return await this.generatePDFReport(data);
+            return this.generatePDFReport(data);
         }
     }
 

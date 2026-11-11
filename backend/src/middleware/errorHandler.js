@@ -5,7 +5,7 @@ const { logger } = require('../config/logger');
  * Global Error Handler
  * Catches all errors and returns formatted response
  */
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res) => {
     const statusCode = err.statusCode || 500;
     const errorMessage = err.message || 'Internal server error';
     const errorCode = err.code || 'INTERNAL_ERROR';

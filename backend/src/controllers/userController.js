@@ -1,8 +1,7 @@
 // backend/src/controllers/userController.js
-const { User, Listing, Transaction, Review, Wishlist } = require('../models');
+const { User, Listing, Transaction, Review } = require('../models');
 const { logger } = require('../config/logger');
 const { sequelize } = require('../config/database');
-const { validationResult } = require('express-validator');
 const uploadService = require('../services/file/uploadService');
 const cacheService = require('../services/cache/cacheService');
 
@@ -162,41 +161,6 @@ class UserController {
             return res.status(400).json({
                 success: false,
                 error: error.message || 'Failed to update profile',
-            });
-        }
-    }
-
-    /**
-     * Upload user avatar
-     */
-    async uploadAvatar(req, res) {
-        try {
-            if (!req.file) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'No image uploaded',
-                });
-            }
-
-            const result = await uploadService.uploadFile(req.file, 'users');
-
-            // Update user avatar
-            const user = await User.findByPk(req.user.id);
-            await user.update({ avatar: result.url });
-
-            // Clear cache
-            await cacheService.deletePattern(`user:${req.user.id}`);
-
-            return res.json({
-                success: true,
-                message: 'Avatar uploaded successfully',
-                data: { avatar: result.url },
-            });
-        } catch (error) {
-            logger.error('Upload avatar error:', error);
-            return res.status(500).json({
-                success: false,
-                error: 'Failed to upload avatar',
             });
         }
     }

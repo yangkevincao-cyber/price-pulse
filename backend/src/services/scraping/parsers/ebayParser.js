@@ -26,7 +26,7 @@ class EbayParser {
     /**
      * Parse eBay search results
      */
-    parse($, searchQuery) {
+    parse($) {
         const products = [];
 
         $(this.selectors.product).each((index, element) => {
@@ -130,7 +130,7 @@ class EbayParser {
     /**
      * Parse product detail page
      */
-    parseProductDetail($, productUrl) {
+    parseProductDetail($) {
         try {
             const title = $('.it-ttl').text().trim() || $('#itemTitle').text().trim();
             const price = $('.vi-price').text().trim() || $('.notranslate .vi-price').text().trim();

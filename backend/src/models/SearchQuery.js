@@ -194,7 +194,6 @@ SearchQuery.addHook('afterCreate', async (searchQuery) => {
 
     if (result && result.count > 50) {
         // Trigger demand alert generation
-        const { DemandAlert } = require('./index');
         // Demand alert logic here
     }
 });

@@ -5,7 +5,6 @@ const { body, param, query } = require('express-validator');
 
 const adminController = require('../controllers/adminController');
 const { authenticate, isAdmin } = require('../middleware/auth');
-const rateLimiter = require('../middleware/rateLimiter');
 
 // Validation rules
 const userUpdateValidation = [

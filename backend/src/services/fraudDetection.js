@@ -285,7 +285,7 @@ class FraudDetectionService {
         return { score: 0, flagged: false };
     }
 
-    generateRecommendations(riskScore, flags) {
+    generateRecommendations(riskScore) {
         if (riskScore > 0.8) {
             return ['BLOCK_TRANSACTION', 'FLAG_USER', 'NOTIFY_ADMIN'];
         } else if (riskScore > 0.5) {

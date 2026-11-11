@@ -1,7 +1,5 @@
 // backend/src/services/analytics/analyticsService.js
 const { sequelize } = require('../../config/database');
-const { User, Transaction, Product, Listing, SearchQuery, DemandAlert } = require('../../models');
-const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
 
 class AnalyticsService {
@@ -282,7 +280,7 @@ class AnalyticsService {
     /**
      * Update real-time dashboard
      */
-    async updateRealTimeDashboard(event) {
+    async updateRealTimeDashboard() {
         const stats = await this.getRealTimeStats();
 
         // Broadcast to admin clients

@@ -2,6 +2,9 @@
 const { Resend } = require('resend');
 const sgMail = require('@sendgrid/mail');
 const { createTransport } = require('nodemailer');
+const db = require('../config/database');
+const Redis = require('ioredis');
+const redis = new Redis(process.env.REDIS_URL);
 
 class EmailService {
     constructor() {

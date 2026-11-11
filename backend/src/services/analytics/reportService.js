@@ -1,6 +1,5 @@
 // backend/src/services/analytics/reportService.js
 const { sequelize } = require('../../config/database');
-const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
 const PDFDocument = require('pdfkit');
 

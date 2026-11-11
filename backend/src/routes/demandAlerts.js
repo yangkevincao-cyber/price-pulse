@@ -1,7 +1,7 @@
 // backend/src/routes/demandAlerts.js
 const express = require('express');
 const router = express.Router();
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const demandAlertController = require('../controllers/demandAlertController');
 const { authenticate, isAdmin } = require('../middleware/auth');

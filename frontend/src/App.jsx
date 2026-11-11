@@ -13,6 +13,8 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const SellerDashboard = lazy(() => import('./pages/SellerDashboard'));
 const DemandAlerts = lazy(() => import('./pages/DemandAlerts'));
+const SellerListings = lazy(() => import('./pages/SellerListings'));
+const SellerAnalytics = lazy(() => import('./pages/SellerAnalytics'));
 const PriceComparison = lazy(() => import('./pages/PriceComparison'));
 const Exchanges = lazy(() => import('./pages/Exchanges'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));

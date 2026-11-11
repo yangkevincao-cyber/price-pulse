@@ -1,7 +1,7 @@
 // backend/src/jobs/weeklyReport.js
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
-const { User, Transaction, Listing, Product } = require('../models');
+const { User, Product } = require('../models');
 const emailService = require('../services/notification/emailService');
 const reportService = require('../services/analytics/reportService');
 

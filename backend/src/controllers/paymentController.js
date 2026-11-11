@@ -4,7 +4,6 @@ const { logger } = require('../config/logger');
 const { sequelize } = require('../config/database');
 const stripeService = require('../services/payment/stripeService');
 const paypalService = require('../services/payment/paypalService');
-const escrowService = require('../services/payment/escrowService');
 
 class PaymentController {
     /**
@@ -87,7 +86,7 @@ class PaymentController {
      */
     async createPaypalOrder(req, res) {
         try {
-            const { amount, currency, transactionId, listingId, sellerId, productId } = req.body;
+            const { amount, currency, transactionId, listingId, sellerId } = req.body;
             const buyerId = req.user.id;
 
             // Verify transaction
@@ -438,7 +437,6 @@ class PaymentController {
     async handlePaypalWebhook(req, res) {
         try {
             // Verify webhook signature
-            const event = req.body;
 
             // Process webhook event
             // PayPal webhook handling logic

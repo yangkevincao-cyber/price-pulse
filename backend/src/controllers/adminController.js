@@ -1,11 +1,9 @@
 // backend/src/controllers/adminController.js
-const { User, Product, Listing, Transaction, Category, DemandAlert, FraudLog } = require('../models');
+const { User, Listing, Transaction, Review, FraudLog } = require('../models');
 const { logger } = require('../config/logger');
 const { sequelize } = require('../config/database');
-const { validationResult } = require('express-validator');
 const cacheService = require('../services/cache/cacheService');
 const scrapingService = require('../services/scraping/scrapingService');
-const metricsService = require('../services/analytics/metricsService');
 const reportService = require('../services/analytics/reportService');
 const fraudDetectionService = require('../services/intelligence/fraudDetectionService');
 
@@ -266,7 +264,6 @@ class AdminController {
     async updateUser(req, res) {
         try {
             const { id } = req.params;
-            const { role, is_active, is_verified, ...updateData } = req.body;
 
             const user = await User.findByPk(id);
 

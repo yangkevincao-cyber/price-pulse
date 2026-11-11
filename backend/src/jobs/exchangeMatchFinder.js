@@ -1,7 +1,7 @@
 // backend/src/jobs/exchangeMatchFinder.js
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
-const { Exchange } = require('../models');
+const { Exchange, User, Notification } = require('../models');
 const exchangeMatchingService = require('../services/intelligence/exchangeMatchingService');
 
 class ExchangeMatchFinderJob {
@@ -66,8 +66,10 @@ class ExchangeMatchFinderJob {
     /**
      * Notify user about matches
      */
+    /**
+ * Notify user about matches
+ */
     async notifyMatches(userId, matches) {
-        const { Notification } = require('../models');
         const topMatches = matches.slice(0, 5);
 
         for (const match of topMatches) {

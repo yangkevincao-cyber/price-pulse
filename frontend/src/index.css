@@ -7,9 +7,6 @@
 
 /* ✅ Base styles */
 @layer base {
-    * {
-        @apply border-border;
-    }
 
     body {
         @apply bg-gray-50 text-gray-900 font-secondary antialiased;

@@ -1,7 +1,6 @@
 // backend/src/jobs/metricsAggregator.js
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
-const { User, Transaction, Listing, DemandAlert, SearchQuery } = require('../models');
 const metricsService = require('../services/analytics/metricsService');
 
 class MetricsAggregatorJob {

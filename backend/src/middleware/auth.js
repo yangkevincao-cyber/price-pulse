@@ -203,7 +203,7 @@ const isOwner = (model, paramName = 'id') => {
 /**
  * Refresh token handler
  */
-const refreshToken = async (req, res, next) => {
+const refreshToken = async (req, res) => {
     try {
         const { refreshToken } = req.body;
         if (!refreshToken) {

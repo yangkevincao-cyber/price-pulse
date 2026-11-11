@@ -1,6 +1,5 @@
 // backend/src/services/pricePredictionService.js
 const db = require('../config/database');
-const { Op } = require('sequelize');
 
 class PricePredictionService {
 

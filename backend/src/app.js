@@ -12,13 +12,19 @@ const { requestId } = require('./middleware/requestId');
 const { logger } = require('./config/logger');
 const { rateLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
-const { initSocket } = require('./socket');
 const { initWorkers } = require('./workers');
 const { initJobs } = require('./jobs');
 const { initEvents } = require('./events');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const { prometheus } = require('./services/monitoring');
+
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', prometheus.register.contentType);
+    res.end(await prometheus.register.metrics());
+});
 
 // ✅ Security middleware
 app.use(helmet({
@@ -116,7 +122,6 @@ async function startServer() {
         });
 
         // ✅ Initialize Socket.IO
-        const io = initSocket(server);
         logger.info('🔌 WebSocket server initialized');
 
         // ✅ Initialize workers
@@ -163,7 +168,7 @@ async function startServer() {
             shutdown();
         });
 
-        process.on('unhandledRejection', (reason, promise) => {
+        process.on('unhandledRejection', (reason) => {
             logger.error('💥 Unhandled Rejection:', reason);
         });
 

@@ -6,7 +6,7 @@ class ConnectionHandler {
     /**
      * Handle new connection
      */
-    async handleConnection(socket, io) {
+    async handleConnection(socket) {
         try {
             const userId = socket.user.id;
             const userKey = `user:${userId}:status`;
@@ -22,7 +22,6 @@ class ConnectionHandler {
             await redis.expire(userKey, 3600); // 1 hour
 
             // Get user's online status for their connections
-            const userSockets = await redis.smembers(`user:${userId}:sockets`);
             await redis.sadd(`user:${userId}:sockets`, socket.id);
             await redis.expire(`user:${userId}:sockets`, 3600);
 

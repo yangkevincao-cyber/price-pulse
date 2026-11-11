@@ -16,3 +16,5 @@ Thumbs.db
 .idea/
 *.sql
 *.dump
+# Local Netlify folder
+.netlify

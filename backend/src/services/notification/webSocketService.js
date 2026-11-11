@@ -1,7 +1,6 @@
 // backend/src/services/notification/webSocketService.js
 const socketIO = require('socket.io');
 const { logger } = require('../../config/logger');
-const { redis } = require('../../config/redis');
 const authConfig = require('../../config/auth');
 const { User } = require('../../models');
 

@@ -28,7 +28,7 @@ class AmazonParser {
     /**
      * Parse Amazon search results
      */
-    parse($, searchQuery) {
+    parse($) {
         const products = [];
 
         $(this.selectors.product).each((index, element) => {
@@ -99,7 +99,7 @@ class AmazonParser {
     /**
      * Parse product detail page (for additional data)
      */
-    parseProductDetail($, productUrl) {
+    parseProductDetail($) {
         try {
             const title = $('h1#title').text().trim() || $('#productTitle').text().trim();
             const price = $('.a-price .a-offscreen').first().text().trim() ||

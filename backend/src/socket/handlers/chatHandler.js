@@ -1,6 +1,6 @@
 // backend/src/socket/handlers/chatHandler.js
 const { logger } = require('../../config/logger');
-const { ChatMessage, ChatRoom, User } = require('../../models');
+const { ChatMessage, User } = require('../../models');
 
 class ChatHandler {
     /**

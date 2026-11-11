@@ -289,7 +289,7 @@ function SellerDashboard() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Demand Score</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                                </tr>
+                                </table>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {data.topProducts?.map((product) => (

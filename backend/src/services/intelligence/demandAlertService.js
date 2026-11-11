@@ -1,6 +1,6 @@
 // backend/src/services/intelligence/demandAlertService.js
 const { sequelize } = require('../../config/database');
-const { DemandAlert, Product, Category, User, Notification } = require('../../models');
+const { DemandAlert, User, Notification } = require('../../models');
 const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
 
@@ -90,7 +90,7 @@ class DemandAlertService {
             product_id, product_name, category_id, category_name,
             alert_type, opportunity_score, searches_this_week,
             search_volume_change_pct, avg_listing_price, active_listings,
-            wishlists, demand_score
+            demand_score
         } = opportunity;
 
         // Check if alert already exists for this product in the last 24 hours
@@ -128,7 +128,7 @@ class DemandAlertService {
                     search_volume_7d: searches_this_week,
                     search_volume_change_pct,
                     avg_listing_price,
-                    suggested_price,
+                    suggestedPrice,
                     active_listings,
                     opportunity_score,
                     message,

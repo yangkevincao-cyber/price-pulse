@@ -1,10 +1,8 @@
 // backend/src/socket/index.js
 const socketIO = require('socket.io');
 const { logger } = require('../config/logger');
-const { redis } = require('../config/redis');
 const authConfig = require('../config/auth');
 const { User } = require('../models');
-const connectionHandler = require('./handlers/connectionHandler');
 const alertHandler = require('./handlers/alertHandler');
 const chatHandler = require('./handlers/chatHandler');
 const notificationHandler = require('./handlers/notificationHandler');

@@ -1,7 +1,7 @@
 // backend/src/routes/categories.js
 const express = require('express');
 const router = express.Router();
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const categoryController = require('../controllers/categoryController');
 const { authenticate, isAdmin } = require('../middleware/auth');

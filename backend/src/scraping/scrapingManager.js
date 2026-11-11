@@ -88,15 +88,15 @@ class WebScraper {
         return results;
     }
 
+    // backend/src/scraping/scrapingManager.js
+
     async scrapeWithPuppeteer(productName) {
-        // For JavaScript-heavy sites that need rendering
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
 
         await page.setUserAgent(this.getRandomUserAgent());
         await page.goto(`https://www.walmart.com/search?q=${encodeURIComponent(productName)}`);
 
-        // Wait for products to load
         await page.waitForSelector('[data-testid="product-title"]');
 
         const products = await page.evaluate(() => {
@@ -105,7 +105,7 @@ class WebScraper {
                 if (i < 10) {
                     items.push({
                         title: el.innerText,
-                        price: document.querySelector('[data-testid="price"]')?.innerText
+                        price: document.querySelector('[data-testid="price"]')?.innerText,
                     });
                 }
             });

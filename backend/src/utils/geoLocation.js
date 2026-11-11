@@ -39,7 +39,6 @@ class GeoLocation {
     static getBoundingBox(lat, lon, radius, unit = 'km') {
         const R = unit === 'km' ? 6371 : 3959;
         const radLat = this.toRadians(lat);
-        const radLon = this.toRadians(lon);
         const radRadius = radius / R;
 
         const minLat = lat - this.toDegrees(radRadius);
@@ -91,7 +90,7 @@ class GeoLocation {
     /**
      * Get distance between two addresses (using geocoding API)
      */
-    static async getDistanceBetweenAddresses(address1, address2) {
+    static async getDistanceBetweenAddresses() {
         // This would typically use a geocoding API
         // Implement with Google Maps API, Mapbox, or similar
         throw new Error('Geocoding API not implemented');
@@ -100,7 +99,7 @@ class GeoLocation {
     /**
      * Get coordinates from address (geocoding)
      */
-    static async geocodeAddress(address) {
+    static async geocodeAddress() {
         // This would typically use a geocoding API
         // Implement with Google Maps API, Mapbox, or similar
         throw new Error('Geocoding API not implemented');
@@ -109,7 +108,7 @@ class GeoLocation {
     /**
      * Get address from coordinates (reverse geocoding)
      */
-    static async reverseGeocode(lat, lon) {
+    static async reverseGeocode() {
         // This would typically use a geocoding API
         // Implement with Google Maps API, Mapbox, or similar
         throw new Error('Reverse geocoding API not implemented');

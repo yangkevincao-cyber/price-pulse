@@ -1,5 +1,5 @@
 // backend/src/services/payment/escrowService.js
-const { Transaction, Payment, User } = require('../../models');
+const { Transaction } = require('../../models');
 const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
 const stripeService = require('./stripeService');
@@ -35,8 +35,6 @@ class EscrowService {
 
         // Process payout
         const amount = transaction.amount;
-        const platformFee = amount * 0.05;
-        const sellerAmount = amount - platformFee;
 
         // Update seller's balance or process payout
         if (transaction.seller.stripe_account_id) {

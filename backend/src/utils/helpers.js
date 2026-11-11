@@ -37,8 +37,8 @@ const generateSlug = (text) => {
         .toLowerCase()
         .trim()
         .replace(/\s+/g, '-')          // Replace spaces with -
-        .replace(/[^\w\-]+/g, '')      // Remove all non-word chars
-        .replace(/\-\-+/g, '-')        // Replace multiple - with single -
+        .replace(/[^\w-]+/g, '')       // ✅ remove non-word chars (keep hyphen)
+        .replace(/--+/g, '-')          // ✅ collapse multiple hyphens
         .replace(/^-+/, '')            // Trim - from start of text
         .replace(/-+$/, '');           // Trim - from end of text
 };

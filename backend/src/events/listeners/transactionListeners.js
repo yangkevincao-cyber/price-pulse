@@ -1,6 +1,6 @@
 // backend/src/events/listeners/transactionListeners.js
 const { logger } = require('../../config/logger');
-const { Transaction, User } = require('../../models');
+const { User } = require('../../models');
 const notificationEmitter = require('../emitters/notificationEmitter');
 const analyticsEmitter = require('../emitters/analyticsEmitter');
 const auditEmitter = require('../emitters/auditEmitter');

@@ -1,10 +1,11 @@
 // backend/src/services/auth/authService.js
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { User } = require('../../models');
+const { User, Listing, Transaction } = require('../../models');
 const authConfig = require('../../config/auth');
 const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
+const { sequelize } = require('../src/config/database');
 const { emailService } = require('../notification/emailService');
 
 class AuthService {
@@ -305,15 +306,23 @@ class AuthService {
     async trackFailedLogin(userId, ipAddress) {
         const key = `failed_login:${userId}`;
         const attempts = await redis.incr(key);
-        await redis.expire(key, 3600); // 1 hour window
+        await redis.expire(key, 3600);
+
+        logger.warn(`Failed login attempt for user ${userId}`, {
+            userId,
+            ipAddress,
+            attempts,
+        });
 
         if (attempts >= 5) {
-            // Temporarily lock account
             await User.update(
                 { is_active: false },
                 { where: { id: userId } }
             );
-            logger.warn(`User account locked due to failed login attempts: ${userId}`);
+            logger.warn(`Account locked for user ${userId} after ${attempts} failed attempts`, {
+                userId,
+                ipAddress,
+            });
         }
 
         return attempts;
@@ -343,7 +352,7 @@ class AuthService {
      */
     async getSession(userId) {
         const key = `session:${userId}`;
-        return await redis.hgetall(key);
+        return redis.hgetall(key);
     }
 
     /**
@@ -365,7 +374,7 @@ class AuthService {
      * Refresh tokens
      */
     async refreshTokens(refreshToken) {
-        return await authConfig.refreshTokens(refreshToken);
+        return authConfig.refreshTokens(refreshToken);
     }
 
     /**

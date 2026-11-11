@@ -7,7 +7,7 @@ class ImageUrlGenerator {
     /**
      * Get product image URLs
      */
-    static getProductImageUrls(product, size = 'medium') {
+    static getProductImageUrls(product) {
         const baseUrl = process.env.CDN_URL || process.env.API_URL;
         const images = product.images || [];
         const mainImage = product.main_image || images[0];
@@ -57,7 +57,7 @@ class ImageUrlGenerator {
     /**
      * Get listing image URLs
      */
-    static getListingImageUrls(listing, index = 0, size = 'medium') {
+    static getListingImageUrls(listing, index = 0) {
         const images = listing.images || [];
         const image = images[index] || images[0];
 

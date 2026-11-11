@@ -1,9 +1,10 @@
 // backend/src/routes/products.js
 const express = require('express');
 const router = express.Router();
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const productController = require('../controllers/productController');
+const uploadService = require('../services/file/uploadService');   // ← ADD
 const { authenticate, isAdmin } = require('../middleware/auth');
 const rateLimiter = require('../middleware/rateLimiter');
 
@@ -58,6 +59,23 @@ router.get('/wishlist',
     productController.getWishlist
 );
 
+// ✅ Product image upload routes (these belong here!)
+router.post('/:id/images',
+    authenticate,
+    uploadService.getMulter('products').array('images', 5),
+    productController.uploadProductImages
+);
+
+router.patch('/:id/images/:imageIndex/main',
+    authenticate,
+    productController.setMainProductImage
+);
+
+router.delete('/:id/images/:imageIndex',
+    authenticate,
+    productController.deleteProductImage
+);
+
 // Admin routes
 router.post('/',
     authenticate,
@@ -82,54 +100,4 @@ router.delete('/:id',
     productController.deleteProduct
 );
 
-// backend/src/routes/products.js
-router.post('/:id/images',
-    authenticate,
-    uploadService.getMulter('products').array('images', 5),
-    productController.uploadProductImages
-);
-
-router.patch('/:id/images/:imageIndex/main',
-    authenticate,
-    productController.setMainProductImage
-);
-
-router.delete('/:id/images/:imageIndex',
-    authenticate,
-    productController.deleteProductImage
-);
-
-// backend/src/routes/users.js
-router.post('/avatar',
-    authenticate,
-    uploadService.getMulter('users', 2 * 1024 * 1024).single('avatar'),
-    userController.uploadAvatar
-);
-
-router.post('/cover',
-    authenticate,
-    uploadService.getMulter('users', 5 * 1024 * 1024).single('cover'),
-    userController.uploadCoverImage
-);
-
-router.get('/:id/avatar',
-    userController.generateDefaultAvatar
-);
-
-// backend/src/routes/listings.js
-router.post('/:id/images',
-    authenticate,
-    uploadService.getMulter('listings').array('images', 5),
-    listingController.uploadListingImages
-);
-
-router.patch('/:id/images/:imageIndex/main',
-    authenticate,
-    listingController.setMainListingImage
-);
-
-router.delete('/:id/images/:imageIndex',
-    authenticate,
-    listingController.deleteListingImage
-);
 module.exports = router;

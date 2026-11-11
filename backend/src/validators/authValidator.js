@@ -56,7 +56,7 @@ class AuthValidator {
                 .withMessage('Password must contain at least one lowercase letter')
                 .matches(/[0-9]/)
                 .withMessage('Password must contain at least one number')
-                .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/)
+                .matches(/[^A-Za-z0-9]/)
                 .withMessage('Password must contain at least one special character'),
 
             body('firstName')
@@ -162,7 +162,7 @@ class AuthValidator {
                 .withMessage('Password must contain at least one lowercase letter')
                 .matches(/[0-9]/)
                 .withMessage('Password must contain at least one number')
-                .matches(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/)
+                .matches(/[^A-Za-z0-9]/)
                 .withMessage('Password must contain at least one special character'),
         ];
     }

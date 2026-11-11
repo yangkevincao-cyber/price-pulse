@@ -1,4 +1,5 @@
 // backend/src/services/cacheService.js
+const db = require('../config/database');
 const Redis = require('ioredis');
 const redis = new Redis(process.env.REDIS_URL);
 
@@ -130,35 +131,6 @@ class CacheService {
         return trending;
     }
 }
-
-// Query optimization with indexes
-const createOptimizedIndexes = async () => {
-    await db.query(`
-        -- Composite indexes for common queries
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_listings_status_price 
-        ON listings(status, price) WHERE status = 'active';
-        
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_search_queries_product_date 
-        ON search_queries(product_id, created_at DESC);
-        
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_prices_product_date 
-        ON external_prices(product_id, scraped_at DESC);
-        
-        -- Partial indexes for active data only
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_active_listings_seller 
-        ON listings(seller_id) WHERE status = 'active';
-        
-        -- GiST index for geolocation queries
-        CREATE EXTENSION IF NOT EXISTS postgis;
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_location 
-        ON users USING GIST (geolocation);
-        
-        -- Covering indexes for frequent queries
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_demand_alerts_seller_unread_covering 
-        ON demand_alerts(seller_id, read) INCLUDE (product_name, demand_score, created_at)
-        WHERE read = false;
-    `);
-};
 
 // Pagination optimization
 const paginatedQuery = async (query, params, page = 1, limit = 20) => {

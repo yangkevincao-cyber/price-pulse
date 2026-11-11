@@ -100,7 +100,7 @@ class DemandAlertService {
 
     calculateSuggestedPrice(opportunity) {
         // Dynamic pricing based on demand
-        let basePrice = opportunity.avg_listing_price || 0;
+        const basePrice = opportunity.avg_listing_price || 0;
         const demandMultiplier = 1 + (opportunity.opportunity_score * 0.3);
 
         // If few sellers, can price higher

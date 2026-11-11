@@ -1,10 +1,9 @@
 // backend/src/services/exchangeService.js
+const db = require('../config/database');
+
 class ExchangeMatchingService {
 
     async findMatches(listingId) {
-        const listing = await db.query(`
-            SELECT * FROM exchange_listings WHERE id = $1
-        `, [listingId]);
 
         // Find potential matches (someone who wants what you have, and has what you want)
         const matches = await db.query(`

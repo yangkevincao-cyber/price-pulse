@@ -27,7 +27,7 @@ class AliexpressParser {
     /**
      * Parse AliExpress search results
      */
-    parse($, searchQuery) {
+    parse($) {
         const products = [];
 
         $(this.selectors.product).each((index, element) => {
@@ -110,7 +110,7 @@ class AliexpressParser {
     /**
      * Parse product detail page
      */
-    parseProductDetail($, productUrl) {
+    parseProductDetail($) {
         try {
             const title = $('.product-title-text').text().trim() ||
                 $('#product-title').text().trim();

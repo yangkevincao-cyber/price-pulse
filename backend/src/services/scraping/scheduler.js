@@ -2,7 +2,6 @@
 const cron = require('node-cron');
 const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
-const { Product, ExternalSource, SearchQuery } = require('../../models');
 const { sequelize } = require('../../config/database');
 const scrapingService = require('./scrapingService');
 

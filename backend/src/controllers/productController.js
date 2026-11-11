@@ -1,9 +1,10 @@
 // backend/src/controllers/productController.js
-const { Product, Category, Listing, PriceHistory, ExternalPrice, Wishlist } = require('../models');
+const { Product, Category, Listing, PriceHistory, Wishlist } = require('../models');
 const { logger } = require('../config/logger');
 const { sequelize } = require('../config/database');
 const { validationResult } = require('express-validator');
 const cacheService = require('../services/cache/cacheService');
+const uploadService = require('../services/file/uploadService');
 const pricePredictionService = require('../services/intelligence/pricePredictionService');
 const recommendationService = require('../services/intelligence/recommendationService');
 
@@ -445,7 +446,7 @@ class ProductController {
      */
     async searchProducts(req, res) {
         try {
-            const { q, limit = 20, categoryId, minPrice, maxPrice, sortBy = 'relevance' } = req.query;
+            const { q, limit = 20, categoryId, sortBy = 'relevance' } = req.query;
 
             if (!q || q.length < 2) {
                 return res.status(400).json({

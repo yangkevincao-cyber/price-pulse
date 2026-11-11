@@ -1,7 +1,7 @@
 // backend/src/routes/transactions.js
 const express = require('express');
 const router = express.Router();
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const transactionController = require('../controllers/transactionController');
 const { authenticate } = require('../middleware/auth');

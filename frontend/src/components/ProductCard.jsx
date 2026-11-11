@@ -2,7 +2,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ShoppingCart, TrendingUp, Clock } from 'lucide-react';
-import { LazyImage } from '../utils/performance';
+//import { LazyImage } from '../utils/performance';
+import LazyImage from '../components/LazyImage';
+import VirtualProductList from '../components/VirtualProductList';
 
 function ProductCard({ product, viewMode = 'grid' }) {
     const {

@@ -1,6 +1,6 @@
 // backend/src/services/intelligence/recommendationService.js
 const { sequelize } = require('../../config/database');
-const { Product, User, Listing, SearchQuery, Wishlist, Transaction, Review } = require('../../models');
+const { Product, Listing, SearchQuery, Wishlist, Transaction, Review } = require('../../models');
 const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
 
@@ -311,7 +311,6 @@ class RecommendationService {
      * Generate recommendations using multiple strategies
      */
     async generateRecommendations(userId, history, limit) {
-        const recommendations = [];
         const strategies = [];
 
         // Strategy 1: Based on purchase history

@@ -1,10 +1,10 @@
 // backend/src/routes/exchanges.js
 const express = require('express');
 const router = express.Router();
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const exchangeController = require('../controllers/exchangeController');
-const { authenticate, isSeller, isAdmin } = require('../middleware/auth');
+const { authenticate, isSeller } = require('../middleware/auth');
 const rateLimiter = require('../middleware/rateLimiter');
 
 // Validation rules

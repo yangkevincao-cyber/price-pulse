@@ -1,10 +1,10 @@
 // backend/src/routes/payments.js
 const express = require('express');
 const router = express.Router();
-const { body, param, query } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const paymentController = require('../controllers/paymentController');
-const { authenticate, isAdmin } = require('../middleware/auth');
+const { authenticate } = require('../middleware/auth');
 const rateLimiter = require('../middleware/rateLimiter');
 
 // Validation rules

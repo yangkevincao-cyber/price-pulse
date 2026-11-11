@@ -19,19 +19,13 @@ export default defineConfig({
                 theme_color: '#1E3A8A',
                 background_color: '#ffffff',
                 display: 'standalone',
+                start_url: '/',
+                // ✅ Comment out icons you don't have yet
                 icons: [
-                    {
-                        src: 'pwa-192x192.png',
-                        sizes: '192x192',
-                        type: 'image/png'
-                    },
-                    {
-                        src: 'pwa-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png'
-                    }
-                ]
-            }
+                    // { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+                    // { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+                ],
+            },
         }),
 
         // ✅ HTML optimization for SEO

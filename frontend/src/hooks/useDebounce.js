@@ -1,80 +1,51 @@
-// frontend/src/hooks/useDebounce.js
-import { useState, useEffect, useCallback, useRef } from 'react';
+// frontend/src/hooks/useProduct.js
+import { useQuery } from 'react-query';
+import api from '../services/api';
 
 /**
- * Debounce a value or function
- * @param {any} value - The value to debounce
- * @param {number} delay - Delay in milliseconds
- * @returns {any} - Debounced value
+ * Fetch a single product by ID
  */
-export const useDebounce = (value, delay = 300) => {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
-
-    return debouncedValue;
-};
-
-/**
- * Debounce a callback function
- * @param {Function} callback - The function to debounce
- * @param {number} delay - Delay in milliseconds
- * @returns {Function} - Debounced callback
- */
-export const useDebouncedCallback = (callback, delay = 300) => {
-    const timeoutRef = useRef(null);
-
-    const debouncedCallback = useCallback((...args) => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
+export function useProduct(productId) {
+    const { data, isLoading, error, refetch } = useQuery(
+        ['product', productId],
+        () => api.get(`/products/${productId}`).then(res => res.data.data),
+        {
+            enabled: !!productId,
+            staleTime: 5 * 60 * 1000,
+            cacheTime: 10 * 60 * 1000,
         }
+    );
 
-        timeoutRef.current = setTimeout(() => {
-            callback(...args);
-            timeoutRef.current = null;
-        }, delay);
-    }, [callback, delay]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []);
-
-    return debouncedCallback;
-};
+    return {
+        product: data?.product || data || null,
+        pricePrediction: data?.price_prediction || null,
+        similarProducts: data?.similar_products || [],
+        loading: isLoading,
+        error,
+        refetch,
+    };
+}
 
 /**
- * Throttle a callback function
- * @param {Function} callback - The function to throttle
- * @param {number} limit - Limit in milliseconds
- * @returns {Function} - Throttled callback
+ * Fetch a product by slug
  */
-export const useThrottledCallback = (callback, limit = 300) => {
-    const inThrottle = useRef(false);
-
-    const throttledCallback = useCallback((...args) => {
-        if (!inThrottle.current) {
-            callback(...args);
-            inThrottle.current = true;
-            setTimeout(() => {
-                inThrottle.current = false;
-            }, limit);
+export function useProductBySlug(slug) {
+    const { data, isLoading, error, refetch } = useQuery(
+        ['product', 'slug', slug],
+        () => api.get(`/products/slug/${slug}`).then(res => res.data.data),
+        {
+            enabled: !!slug,
+            staleTime: 5 * 60 * 1000,
         }
-    }, [callback, limit]);
+    );
 
-    return throttledCallback;
-};
+    return {
+        product: data?.product || null,
+        pricePrediction: data?.price_prediction || null,
+        loading: isLoading,
+        error,
+        refetch,
+    };
+}
 
-export default useDebounce;
+export default useProduct;

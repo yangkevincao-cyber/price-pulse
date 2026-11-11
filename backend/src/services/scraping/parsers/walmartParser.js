@@ -27,7 +27,7 @@ class WalmartParser {
     /**
      * Parse Walmart search results
      */
-    parse($, searchQuery) {
+    parse($) {
         const products = [];
 
         $(this.selectors.product).each((index, element) => {
@@ -109,7 +109,7 @@ class WalmartParser {
     /**
      * Parse product detail page
      */
-    parseProductDetail($, productUrl) {
+    parseProductDetail($) {
         try {
             const title = $('[data-testid="product-title"]').text().trim() ||
                 $('.prod-title').text().trim();

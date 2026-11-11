@@ -1,7 +1,6 @@
 // backend/src/services/notification/pushNotificationService.js
 const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
-const { User } = require('../../models');
 
 class PushNotificationService {
     /**
@@ -91,7 +90,7 @@ class PushNotificationService {
     /**
      * Send web push
      */
-    async sendWebPush(token, payload) {
+    async sendWebPush(token) {
         // Implementation using web-push library
         // const webpush = require('web-push');
         // webpush.setVapidDetails(...)
@@ -104,7 +103,7 @@ class PushNotificationService {
     /**
      * Send FCM (Firebase Cloud Messaging)
      */
-    async sendFCM(token, payload) {
+    async sendFCM(token) {
         // Implementation using firebase-admin
         // const admin = require('firebase-admin');
         // await admin.messaging().send({
@@ -122,7 +121,7 @@ class PushNotificationService {
     /**
      * Send APNS (Apple Push Notification Service)
      */
-    async sendAPNS(token, payload) {
+    async sendAPNS(token) {
         // Implementation using apns2
         // const apn = require('apn');
         // const provider = new apn.Provider(...)
@@ -218,7 +217,7 @@ class PushNotificationService {
     /**
      * Send notification to subscribers of a topic
      */
-    async sendToTopic(topic, notification) {
+    async sendToTopic(topic) {
         // This would integrate with FCM topic messaging
         // await admin.messaging().sendToTopic(topic, {
         //     notification: {

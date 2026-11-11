@@ -5,7 +5,6 @@ const { body, query } = require('express-validator');
 
 const analyticsController = require('../controllers/analyticsController');
 const { authenticate, isAdmin } = require('../middleware/auth');
-const rateLimiter = require('../middleware/rateLimiter');
 
 // Validation rules
 const eventValidation = [

@@ -1,5 +1,5 @@
 // backend/src/controllers/exchangeController.js
-const { Exchange, User, Product, Category, Notification } = require('../models');
+const { Exchange, User, Product, Notification } = require('../models');
 const { logger } = require('../config/logger');
 const { sequelize } = require('../config/database');
 const { validationResult } = require('express-validator');

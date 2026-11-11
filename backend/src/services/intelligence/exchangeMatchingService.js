@@ -165,13 +165,13 @@ class ExchangeMatchingService {
     /**
      * Calculate suggested cash adjustment
      */
-    calculateCashAdjustment(match, listing) {
+    calculateCashAdjustment(match) {
         // Get market prices for both products
         const offeredPrice = match.offeredProduct?.estimated_value || 0;
         const wantedPrice = match.wantedProduct?.estimated_value || 0;
 
         // Calculate value difference
-        const valueDifference = offeredPrice - wantedPrice;
+        //const valueDifference = offeredPrice - wantedPrice;
 
         // Adjust based on conditions
         const conditionMultiplier = {

@@ -338,22 +338,18 @@ class AuthConfig {
     }
 
     /**
-     * Validate password strength
-     */
+ * Validate password strength
+ */
     validatePassword(password) {
         const requirements = {
-            minLength: 8,
+            minLength: password.length >= 8,
             hasUpperCase: /[A-Z]/.test(password),
             hasLowerCase: /[a-z]/.test(password),
             hasNumber: /[0-9]/.test(password),
-            hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+            hasSpecialChar: /[^A-Za-z0-9]/.test(password),  // ✅ simplified
         };
 
-        const isValid = password.length >= requirements.minLength &&
-            requirements.hasUpperCase &&
-            requirements.hasLowerCase &&
-            requirements.hasNumber &&
-            requirements.hasSpecialChar;
+        const isValid = Object.values(requirements).every(Boolean);
 
         return {
             isValid,

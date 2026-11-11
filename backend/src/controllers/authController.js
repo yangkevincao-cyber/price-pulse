@@ -104,7 +104,7 @@ class AuthController {
     /**
      * Verify social token
      */
-    async verifySocialToken(provider, token) {
+    async verifySocialToken() {
         // Implementation for Google, Facebook, etc.
         // This would call the respective OAuth APIs
         throw new Error('Social login provider not implemented');

@@ -18,9 +18,6 @@ const analyticsRoutes = require('./analytics');
 const notificationRoutes = require('./notifications');
 
 // Import middleware
-const { authenticate, isAdmin } = require('../middleware/auth');
-const rateLimiter = require('../middleware/rateLimiter');
-
 // Health check (public)
 router.get('/health', (req, res) => {
     res.json({

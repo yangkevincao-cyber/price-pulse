@@ -1,0 +1,13 @@
+# backend/render.yaml
+services:
+  - type: web
+    name: price-pulse-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Note: You will add the database and Redis connection 
+      # strings manually in the Render Dashboard to keep them secret.

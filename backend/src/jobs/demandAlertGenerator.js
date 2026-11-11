@@ -1,7 +1,7 @@
 // backend/src/jobs/demandAlertGenerator.js
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
-const { Product, Category, User, DemandAlert } = require('../models');
+const { User } = require('../models');
 const demandAlertService = require('../services/intelligence/demandAlertService');
 const notificationWorker = require('../workers/notificationWorker');
 

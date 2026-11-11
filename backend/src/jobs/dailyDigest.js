@@ -1,7 +1,7 @@
 // backend/src/jobs/dailyDigest.js
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
-const { User, DemandAlert, Transaction, Listing } = require('../models');
+const { User, DemandAlert } = require('../models');
 const emailService = require('../services/notification/emailService');
 
 class DailyDigestJob {
