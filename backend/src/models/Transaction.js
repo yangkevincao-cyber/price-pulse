@@ -1,5 +1,5 @@
 // backend/src/models/Transaction.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Transaction = sequelize.define('Transaction', {
@@ -291,7 +291,7 @@ Transaction.addScope('completed', {
 });
 
 Transaction.addScope('pending', {
-    where: { status: { [sequelize.Op.in]: ['pending', 'payment_pending', 'payment_processing'] } },
+    where: { status: { [Op.in]: ['pending', 'payment_pending', 'payment_processing'] } },
 });
 
 // Hooks

@@ -1,5 +1,5 @@
 // backend/src/models/DemandAlert.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const DemandAlert = sequelize.define('DemandAlert', {
@@ -198,7 +198,7 @@ DemandAlert.addScope('recent', {
 });
 
 DemandAlert.addScope('highOpportunity', {
-    where: { opportunity_score: { [sequelize.Op.gt]: 0.7 } },
+    where: { opportunity_score: { [Op.gt]: 0.7 } },
     order: [['opportunity_score', 'DESC']],
 });
 

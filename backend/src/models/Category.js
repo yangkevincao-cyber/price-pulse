@@ -1,5 +1,5 @@
 // backend/src/models/Category.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Category = sequelize.define('Category', {
@@ -167,7 +167,7 @@ Category.prototype.updateCounts = async function () {
         where: {
             category_id: this.id,
             status: 'active',
-            available_quantity: { [sequelize.Op.gt]: 0 },
+            available_quantity: { [Op.gt]: 0 },
         },
     });
 

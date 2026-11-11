@@ -1,5 +1,5 @@
 // backend/src/models/Exchange.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Exchange = sequelize.define('Exchange', {
@@ -189,7 +189,7 @@ Exchange.prototype.toJSON = function () {
 Exchange.addScope('active', {
     where: {
         status: 'active',
-        expires_at: { [sequelize.Op.gt]: new Date() },
+        expires_at: { [Op.gt]: new Date() },
     },
 });
 

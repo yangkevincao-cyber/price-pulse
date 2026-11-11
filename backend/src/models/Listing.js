@@ -1,5 +1,5 @@
 // backend/src/models/Listing.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
 
@@ -273,8 +273,8 @@ Listing.prototype.toJSON = function () {
 Listing.addScope('active', {
     where: {
         status: 'active',
-        available_quantity: { [sequelize.Op.gt]: 0 },
-        expires_at: { [sequelize.Op.gt]: new Date() },
+        available_quantity: { [Op.gt]: 0 },
+        expires_at: { [Op.gt]: new Date() },
     },
 });
 

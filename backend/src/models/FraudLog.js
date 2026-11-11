@@ -1,5 +1,5 @@
 // backend/src/models/FraudLog.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const FraudLog = sequelize.define('FraudLog', {
@@ -199,7 +199,7 @@ FraudLog.addScope('unresolved', {
 
 FraudLog.addScope('highRisk', {
     where: {
-        severity: { [sequelize.Op.in]: ['high', 'critical'] },
+        severity: { [Op.in]: ['high', 'critical'] },
     },
 });
 

@@ -1,5 +1,5 @@
 // backend/src/models/PriceHistory.js
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const PriceHistory = sequelize.define('PriceHistory', {
@@ -85,13 +85,13 @@ PriceHistory.addScope('forProduct', (productId) => ({
 
 PriceHistory.addScope('last30Days', {
     where: {
-        created_at: { [sequelize.Op.gt]: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        created_at: { [Op.gt]: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
     },
 });
 
 PriceHistory.addScope('last7Days', {
     where: {
-        created_at: { [sequelize.Op.gt]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        created_at: { [Op.gt]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
     },
 });
 
