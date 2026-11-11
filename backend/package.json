@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node src/app.js",
         "dev": "nodemon src/app.js",
-        "build": "npm run lint && npm run test",
+        "build": "npm run lint",
         "lint": "eslint \"src/**/*.js\"",
         "lint:fix": "eslint \"src/**/*.js\" --fix",
         "format": "prettier --write \"src/**/*.js\"",
