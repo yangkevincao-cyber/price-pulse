@@ -54,8 +54,4 @@ module.exports = {
     // Coverage reporters
     coverageReporters: ['text', 'lcov', 'html'],
 
-    // Global teardown
-    globalTeardown: async () => {
-        // Cleanup
-    },
 };
