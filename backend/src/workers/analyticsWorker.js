@@ -2,7 +2,8 @@
 const { Queue, Worker } = require('bullmq');
 const { redis } = require('../config/redis');
 const { logger } = require('../config/logger');
-const { sequelize } = require('../src/config/database');
+// backend/src/services/auth/authService.js  — CORRECT
+const { sequelize } = require('../../config/database');
 const analyticsService = require('../services/analytics/analyticsService');
 const metricsService = require('../services/analytics/metricsService');
 

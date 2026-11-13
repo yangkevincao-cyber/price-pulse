@@ -5,7 +5,8 @@ const { User, Listing, Transaction } = require('../../models');
 const authConfig = require('../../config/auth');
 const { logger } = require('../../config/logger');
 const { redis } = require('../../config/redis');
-const { sequelize } = require('../src/config/database');
+// backend/src/services/auth/authService.js  — CORRECT
+const { sequelize } = require('../../config/database');
 const { emailService } = require('../notification/emailService');
 
 class AuthService {
