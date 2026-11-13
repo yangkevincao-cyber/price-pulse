@@ -12,6 +12,10 @@ RUN apk add --no-cache \
 # Create app directory
 WORKDIR /app
 
+# backend/Dockerfile
+COPY package*.json .npmrc ./
+RUN npm install
+
 # Copy package files
 COPY package*.json ./
 RUN npm ci --only=production --legacy-peer-deps
