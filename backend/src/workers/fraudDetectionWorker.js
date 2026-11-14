@@ -407,3 +407,4 @@ class FraudDetectionWorker {
 }
 
 module.exports = new FraudDetectionWorker();
+

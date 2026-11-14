@@ -199,3 +199,4 @@ class ScrapingWorker {
 }
 
 module.exports = new ScrapingWorker();
+

@@ -398,3 +398,4 @@ class PriceUpdateWorker {
 }
 
 module.exports = new PriceUpdateWorker();
+

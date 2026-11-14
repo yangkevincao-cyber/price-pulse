@@ -197,3 +197,4 @@ class EmailWorker {
 }
 
 module.exports = new EmailWorker();
+

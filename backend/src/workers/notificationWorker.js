@@ -367,3 +367,4 @@ class NotificationWorker {
 }
 
 module.exports = new NotificationWorker();
+
