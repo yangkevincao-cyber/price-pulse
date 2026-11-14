@@ -54,7 +54,7 @@ router.use('/analytics', analyticsRoutes);
 router.use('/notifications', notificationRoutes);
 
 // 404 handler
-router.use('*', (req, res) => {
+router.use('/{*splat}', (req, res) => {
     res.status(404).json({
         success: false,
         error: 'Route not found',
