@@ -11,7 +11,7 @@ const { redis } = require('./config/redis');
 const { errorHandler } = require('./middleware/errorHandler');
 const requestId = require('./middleware/requestId');
 const { logger } = require('./config/logger');
-const { rateLimiter } = require('./middleware/rateLimiter');
+const rateLimiter = require('./middleware/rateLimiter');
 const routes = require('./routes');
 const { initWorkers } = require('./workers');
 const { initJobs } = require('./jobs');
@@ -239,4 +239,5 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Export for testing
 module.exports = { app, startServer };
+
 
