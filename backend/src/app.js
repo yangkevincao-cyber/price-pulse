@@ -43,8 +43,6 @@ assertFn('requestId', requestId);
 
 // For object exports, use specific properties:
 assertFn('rateLimiter.api', rateLimiter.api);
-assertFn('logRequest', logRequest);
-
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', prometheus.register.contentType);
     res.end(await prometheus.register.metrics());
