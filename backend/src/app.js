@@ -1,9 +1,10 @@
 // backend/src/app.js
+// backend/src/app.js — ✅ CORRECT
+require('dotenv').config();   // ← FIRST line
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
-require('dotenv').config();
 
 const { sequelize } = require('./config/database');
 const { redis } = require('./config/redis');
@@ -20,6 +21,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const { prometheus } = require('./services/monitoring');
+
+// backend/src/app.js — after imports, before app.use() calls
+
+const assertFn = (name, fn) => {
+    if (typeof fn !== 'function') {
+        const available = typeof fn === 'object' && fn !== null
+            ? `Available keys: ${Object.keys(fn).join(', ')}`
+            : `Got: ${typeof fn}`;
+        throw new Error(
+            `❌ app.use() needs a function for '${name}', but got ${typeof fn}. ${available}`
+        );
+    }
+};
+
+// Now wrap every app.use(middleware) to catch before Express throws
+assertFn('helmet', helmet);
+assertFn('cors', cors);
+assertFn('requestId', requestId);
+// assertFn('rateLimiter', rateLimiter);   // ← if this fails, rateLimiter is an object!
+
+// For object exports, use specific properties:
+assertFn('rateLimiter.api', rateLimiter.api);
+assertFn('logRequest', logRequest);
 
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', prometheus.register.contentType);
@@ -77,6 +101,10 @@ app.use(cors({
 }));
 
 // ✅ Request ID middleware
+// Validate before using
+if (typeof requestId !== 'function') {
+    throw new Error(`requestId middleware is ${typeof requestId}, expected function. Check module.exports in middleware/requestId.js`);
+}
 app.use(requestId);
 
 // ✅ Logging middleware
@@ -123,7 +151,7 @@ app.use((req, res) => {
 });
 
 // ✅ Error handler (must be last)
-app.use(errorHandler);
+app.use(errorHandler.errorHandler);
 
 // ✅ Start server
 async function startServer() {
