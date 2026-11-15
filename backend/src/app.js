@@ -149,7 +149,7 @@ app.use((req, res) => {
 });
 
 // ✅ Error handler (must be last)
-app.use(errorHandler.errorHandler);
+app.use(errorHandler);
 
 // ✅ Start server
 async function startServer() {
@@ -239,5 +239,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Export for testing
 module.exports = { app, startServer };
+
+
 
 
