@@ -9,7 +9,7 @@ const path = require('path');
 const { sequelize } = require('./config/database');
 const { redis } = require('./config/redis');
 const { errorHandler } = require('./middleware/errorHandler');
-const { requestId } = require('./middleware/requestId');
+const requestId = require('./middleware/requestId');
 const { logger } = require('./config/logger');
 const { rateLimiter } = require('./middleware/rateLimiter');
 const routes = require('./routes');
@@ -239,3 +239,4 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Export for testing
 module.exports = { app, startServer };
+
