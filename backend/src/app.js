@@ -27,6 +27,25 @@ app.get('/metrics', async (req, res) => {
 });
 
 // ✅ Security middleware
+// backend/src/app.js — at the very top after imports
+
+// Validate middleware imports
+const middlewares = {
+    cors: require('./middleware/cors'),
+    requestId: require('./middleware/requestId'),
+    rateLimiter: require('./middleware/rateLimiter'),
+    logger: require('./middleware/logger'),
+    validation: require('./middleware/validation'),
+};
+
+for (const [name, fn] of Object.entries(middlewares)) {
+    if (typeof fn !== 'function' && typeof fn !== 'object') {
+        throw new Error(`Middleware '${name}' is not a function or object — check exports`);
+    }
+}
+
+console.log('✅ All middleware loaded');
+
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -66,7 +85,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ✅ Rate limiting
-app.use(rateLimiter);
+app.use(rateLimiter.api);
 
 // ✅ Static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
