@@ -27,10 +27,13 @@ app.get('/metrics', async (req, res) => {
 });
 
 // ✅ Security middleware
-// backend/src/app.js — at the very top after imports
+// Validate ALL modules used with app.use()
+const routeModules = {
+    routes: require('./routes'),
+    uploads: require('./routes/uploads'),
+};
 
-// Validate middleware imports
-const middlewares = {
+const otherMiddleware = {
     cors: require('./middleware/cors'),
     requestId: require('./middleware/requestId'),
     rateLimiter: require('./middleware/rateLimiter'),
@@ -38,13 +41,19 @@ const middlewares = {
     validation: require('./middleware/validation'),
 };
 
-for (const [name, fn] of Object.entries(middlewares)) {
-    if (typeof fn !== 'function' && typeof fn !== 'object') {
-        throw new Error(`Middleware '${name}' is not a function or object — check exports`);
+for (const [name, mod] of Object.entries(otherMiddleware)) {
+    if (typeof mod !== 'function' && typeof mod !== 'object') {
+        throw new Error(`Middleware '${name}' exports ${typeof mod} — check module.exports`);
     }
 }
 
-console.log('✅ All middleware loaded');
+for (const [name, mod] of Object.entries(routeModules)) {
+    if (typeof mod !== 'function') {
+        throw new Error(`Route module '${name}' exports ${typeof mod} — should export router function`);
+    }
+}
+
+console.log('✅ All middleware and routes validated');
 
 app.use(helmet({
     contentSecurityPolicy: {
