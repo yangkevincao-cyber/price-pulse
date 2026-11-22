@@ -84,7 +84,7 @@ class MigrationRunner {
 
         // Run up method
         if (migrationModule.up) {
-            await migrationModule.up(queryInterface, sequelize);
+            await migrationModule.up(queryInterface, Sequelize);
         }
 
         // Record migration
@@ -122,7 +122,7 @@ class MigrationRunner {
             // Run down method
             if (migrationModule.down) {
                 const queryInterface = sequelize.getQueryInterface();
-                await migrationModule.down(queryInterface, sequelize);
+                await migrationModule.down(queryInterface, Sequelize);
             }
 
             // Remove from migration table
@@ -183,3 +183,5 @@ class MigrationRunner {
 }
 
 module.exports = new MigrationRunner();
+
+
