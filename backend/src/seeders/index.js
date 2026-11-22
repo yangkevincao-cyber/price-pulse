@@ -1,4 +1,5 @@
 // backend/src/seeders/index.js
+const { Sequelize } = require('sequelize');
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
 const fs = require('fs');
@@ -83,7 +84,7 @@ class SeederRunner {
 
         // Run up method
         if (seederModule.up) {
-            await seederModule.up(queryInterface, sequelize);
+            await seederModule.up(queryInterface, Sequelize);
         }
 
         // Record seeder
@@ -137,3 +138,4 @@ class SeederRunner {
 }
 
 module.exports = new SeederRunner();
+
