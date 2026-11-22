@@ -1,4 +1,5 @@
 // backend/src/migrations/index.js
+const { Sequelize } = require('sequelize');
 const { sequelize } = require('../config/database');
 const { logger } = require('../config/logger');
 const fs = require('fs');
@@ -183,5 +184,6 @@ class MigrationRunner {
 }
 
 module.exports = new MigrationRunner();
+
 
 
