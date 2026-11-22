@@ -14,7 +14,7 @@ async function seedDev() {
         logger.info('🌱 Seeding development database...');
 
         // Check if in development environment
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV === 'production' && !process.env.SEED_CONFIRM) {
             const readline = require('readline');
             const rl = readline.createInterface({
                 input: process.stdin,
