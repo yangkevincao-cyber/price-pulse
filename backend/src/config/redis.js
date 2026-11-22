@@ -17,13 +17,15 @@ class RedisClient {
             host: process.env.REDIS_HOST || 'localhost',
             port: process.env.REDIS_PORT || 6379,
             password: process.env.REDIS_PASSWORD || undefined,
+            maxRetriesPerRequest: null,     // ← ADD THIS (BullMQ requirement)
+            enableReadyCheck: false,         // ← ADD THIS (BullMQ recommends)
             retryStrategy: (times) => {
                 const delay = Math.min(times * 50, 2000);
                 logger.warn(`Redis connection retry ${times} in ${delay}ms`);
                 return delay;
             },
-            maxRetriesPerRequest: 3,
-            enableReadyCheck: true,
+            //maxRetriesPerRequest: 3,
+            //enableReadyCheck: true,
             lazyConnect: true,
         };
 
